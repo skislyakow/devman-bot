@@ -38,5 +38,5 @@ if __name__ == "__main__":
     if data["results"]:
         last_ts = data["results"][0]["timestamp"]
         print(f"Ждем новых ревью после {last_ts} ...")
-        # result = wait_for_review(timestamp=last_ts)
-        # print(result)
+        result = wait_for_review(timestamp=last_ts)
+        print(result)
