@@ -28,6 +28,20 @@ def wait_for_review(timestamp=None):
 
 
 if __name__ == "__main__":
+    timestamp = None
+    while True:
+        result = wait_for_review(timestamp=timestamp)
+        if result["status"] == "found":
+            for attempt in result["new_attempts"]:
+                status = "✅" if not attempt["is_negative"] else "❌"
+                print(
+                    f"{status} {attempt['lesson_title']} - {attempt['submitted_at']}"
+                )
+            timestamp = result["last_attempt_timestamp"]
+        elif result["status"] == "timeout":
+            timestamp = result["timestamp_to_request"]
+
+"""
     data = get_reviews()
     for review in data["results"]:
         status = "✅" if not review["is_negative"] else "❌"
@@ -40,3 +54,4 @@ if __name__ == "__main__":
         print(f"Ждем новых ревью после {last_ts} ...")
         result = wait_for_review(timestamp=last_ts)
         print(result)
+"""
