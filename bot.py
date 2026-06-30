@@ -35,11 +35,13 @@ chat_ids = set()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message or not update.effective_chat:
+        return
     chat_id = update.effective_chat.id
     chat_ids.add(chat_id)
-    await update.message.reply_text(
-        f"Hello, {update.effective_user.full_name}. Бот включён!"
-    )
+    user = update.effective_user
+    name = user.full_name if user else "Незнакомец"
+    await update.message.reply_text(f"Hello, {name}. Бот включён!")
 
 
 async def poll_devman(app: Application, devman_token: str):
@@ -68,7 +70,8 @@ async def main():
     app.add_handler(CommandHandler("start", start))
 
     async with app:
-        await app.updater.start_polling()
+        if app.updater:
+            await app.updater.start_polling()
         await app.start()
         await poll_devman(app, devman_token)
 
