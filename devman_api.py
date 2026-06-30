@@ -1,8 +1,12 @@
 import json
+import os
+
+from dotenv import load_dotenv
 import requests
 import requests.exceptions
 
-TOKEN = "d109bb7fef85d77beffa5832020d9401d4c6bb21"
+load_dotenv()
+TOKEN = os.environ["DEVMAN_TOKEN"]
 BASE_URL = "https://dvmn.org/api/"
 
 
