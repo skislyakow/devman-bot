@@ -1,5 +1,6 @@
 import json
 import requests
+import requests.exceptions
 
 TOKEN = "d109bb7fef85d77beffa5832020d9401d4c6bb21"
 BASE_URL = "https://dvmn.org/api/"
@@ -20,11 +21,19 @@ def wait_for_review(timestamp=None):
     params = {}
     if timestamp:
         params["timestamp"] = timestamp
-    response = requests.get(
-        f"{BASE_URL}long_polling/", headers=headers, params=params, timeout=100
-    )
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(
+            f"{BASE_URL}long_polling/",
+            headers=headers,
+            params=params,
+            timeout=5,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ReadTimeout:
+        return {"status": "timeout", "timestamp_to_request": timestamp}
+    except requests.exceptions.ConnectionError:
+        return {"status": "timeout", "timestamp_to_request": timestamp}
 
 
 if __name__ == "__main__":
