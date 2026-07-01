@@ -7,7 +7,10 @@ import requests.exceptions
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+
 BASE_URL = "https://dvmn.org/api/"
+
+chat_ids: set[int] = set()
 
 
 def wait_for_review(devman_token, timestamp=None):
@@ -29,9 +32,6 @@ def wait_for_review(devman_token, timestamp=None):
         requests.exceptions.ConnectionError,
     ):
         return {"status": "timeout", "timestamp_to_request": timestamp}
-
-
-chat_ids = set()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,6 +70,11 @@ async def poll_devman(app: Application, devman_token: str):
 
 async def main():
     load_dotenv()
+
+    initial_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if initial_chat_id:
+        chat_ids.add(int(initial_chat_id))
+
     telegram_token = os.environ["TELEGRAM_BOT_TOKEN"]
     devman_token = os.environ["DEVMAN_TOKEN"]
 
