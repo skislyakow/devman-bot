@@ -53,7 +53,14 @@ async def poll_devman(app: Application, devman_token: str):
         if result["status"] == "found":
             for attempt in result["new_attempts"]:
                 emoji = "✅" if not attempt["is_negative"] else "❌"
-                text = f"Преподаватель проверил работу!\n{emoji} {attempt['lesson_title']}"
+                status = (
+                    "принята" if not attempt["is_negative"] else "отклонена"
+                )
+                text = (
+                    f"Преподаватель проверил работу!\n"
+                    f"«{attempt['lesson_title']}» - {status} {emoji}\n"
+                    f"{attempt['lesson_url']}"
+                )
                 for chat_id in chat_ids:
                     await app.bot.send_message(chat_id=chat_id, text=text)
             timestamp = result["last_attempt_timestamp"]
