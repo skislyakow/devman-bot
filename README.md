@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/python-3.9+-blue)
 ![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-Bot-blueviolet)
 ![requests](https://img.shields.io/badge/requests-long--polling-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 Telegram-бот, который отслеживает проверки работ на [Devman](https://dvmn.org) через Long Polling API и присылает уведомления в Telegram.
 
@@ -24,7 +25,7 @@ Telegram-бот, который отслеживает проверки рабо
 ## Установка
 
 ```bash
-git clone https://github.com/ваш-username/devman-bot.git
+git clone https://github.com/skislyakow/devman-bot.git
 cd devman-bot
 python -m venv .venv
 source .venv/bin/activate      # Linux/macOS
