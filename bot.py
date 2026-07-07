@@ -11,7 +11,7 @@ from telegram import Bot
 BASE_URL = "https://dvmn.org/api/"
 
 
-def wait_for_review(devman_token, timestamp=None):
+def fetch_review(devman_token, timestamp=None):
     headers = {"Authorization": f"Token {devman_token}"}
     params = {}
     if timestamp:
@@ -32,12 +32,10 @@ def wait_for_review(devman_token, timestamp=None):
         return {"status": "timeout", "timestamp_to_request": timestamp}
 
 
-async def poll_devman(bot: Bot, devman_token: str, chat_id: int) -> None:
+async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
     timestamp = None
     while True:
-        result = await asyncio.to_thread(
-            wait_for_review, devman_token, timestamp
-        )
+        result = await asyncio.to_thread(fetch_review, devman_token, timestamp)
         if result["status"] == "found":
             for attempt in result["new_attempts"]:
                 emoji = "✅" if not attempt["is_negative"] else "❌"
@@ -62,7 +60,7 @@ async def main() -> None:
     chat_id = int(os.environ["TELEGRAM_CHAT_ID"])
     devman_token = os.environ["DEVMAN_TOKEN"]
 
-    await poll_devman(bot, devman_token, chat_id)
+    await monitor_reviews(bot, devman_token, chat_id)
 
 
 if __name__ == "__main__":
