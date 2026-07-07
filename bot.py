@@ -29,7 +29,7 @@ def fetch_review(devman_token, timestamp=None):
         requests.exceptions.ReadTimeout,
         requests.exceptions.ConnectionError,
     ):
-        return {"status": "timeout", "timestamp_to_request": timestamp}
+        return {"status": "error", "timestamp_to_request": timestamp}
 
 
 async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
@@ -49,7 +49,7 @@ async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
                 )
                 await bot.send_message(chat_id=chat_id, text=text)
             timestamp = result["last_attempt_timestamp"]
-        elif result["status"] == "timeout":
+        elif result["status"] in ("timeout", "error"):
             timestamp = result["timestamp_to_request"]
 
 
