@@ -1,11 +1,12 @@
 # Devman Bot
 
 ![Python](https://img.shields.io/badge/python-3.9+-blue)
-![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-async-green)
+![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-Bot-blueviolet)
+![requests](https://img.shields.io/badge/requests-long--polling-orange)
 
 Telegram-бот, который отслеживает проверки работ на [Devman](https://dvmn.org) через Long Polling API и присылает уведомления в Telegram.
 
-Бот написан на **асинхронной версии python-telegram-bot (v22+)**, что позволяет параллельно обрабатывать сообщения от Telegram и Long Polling запросы к Devman без блокировок.
+Стек: `requests` (Long Polling API Девмана) + python-telegram-bot (отправка уведомлений в Telegram).
 
 ## Как это работает
 
@@ -49,15 +50,12 @@ TELEGRAM_CHAT_ID=ваш_telegram_id
 | `TELEGRAM_BOT_TOKEN` | Создать бота через [@BotFather](https://t.me/botfather) |
 | `TELEGRAM_CHAT_ID` | Узнать через [@userinfobot](https://t.me/userinfobot) (опционально) |
 
-`TELEGRAM_CHAT_ID` можно не указывать — достаточно после запуска написать боту `/start`, и он сам запомнит ваш чат.
 
 ## Запуск
 
 ```bash
 python bot.py
 ```
-
-После запуска напишите боту `/start`, чтобы подписаться на уведомления.
 
 ## Пример уведомления
 
@@ -67,17 +65,8 @@ python bot.py
 https://dvmn.org/modules/chat-bots/lesson/devman-bot/
 ```
 
-## Файлы проекта
-
-| Файл | Назначение |
-|---|---|
-| `bot.py` | Основной скрипт бота |
-| `.env` | Переменные окружения (токены) — не коммитить! |
-| `.gitignore` | Исключения для git |
-| `requirements.txt` | Зависимости проекта |
-
 ## Зависимости
 
 - `requests` — HTTP-запросы к API Девмана
-- `python-telegram-bot` — асинхронный фреймворк для Telegram Bot API (v22+)
+- `python-telegram-bot` — класс Bot для отправки сообщений Telegram Bot API
 - `python-dotenv` — загрузка переменных из `.env`
