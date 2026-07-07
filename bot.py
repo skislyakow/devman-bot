@@ -10,8 +10,6 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 BASE_URL = "https://dvmn.org/api/"
 
-chat_ids: set[int] = set()
-
 
 def wait_for_review(devman_token, timestamp=None):
     headers = {"Authorization": f"Token {devman_token}"}
@@ -38,13 +36,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.effective_chat:
         return
     chat_id = update.effective_chat.id
-    chat_ids.add(chat_id)
+    context.bot_data["chat_ids"].add(chat_id)
     user = update.effective_user
     name = user.full_name if user else "Незнакомец"
     await update.message.reply_text(f"Hello, {name}. Бот включён!")
 
 
-async def poll_devman(app: Application, devman_token: str):
+async def poll_devman(app: Application, devman_token: str, chat_ids: set[int]):
     timestamp = None
     while True:
         result = await asyncio.to_thread(
@@ -68,9 +66,9 @@ async def poll_devman(app: Application, devman_token: str):
             timestamp = result["timestamp_to_request"]
 
 
-async def main():
+async def main() -> None:
     load_dotenv()
-
+    chat_ids: set[int] = set()
     initial_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
     if initial_chat_id:
         chat_ids.add(int(initial_chat_id))
@@ -79,13 +77,14 @@ async def main():
     devman_token = os.environ["DEVMAN_TOKEN"]
 
     app = Application.builder().token(telegram_token).build()
+    app.bot_data["chat_ids"] = chat_ids
     app.add_handler(CommandHandler("start", start))
 
     async with app:
         if app.updater:
             await app.updater.start_polling()
         await app.start()
-        await poll_devman(app, devman_token)
+        await poll_devman(app, devman_token, chat_ids)
 
 
 if __name__ == "__main__":
