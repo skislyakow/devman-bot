@@ -13,6 +13,23 @@ from telegram import Bot
 BASE_URL = "https://dvmn.org/api/"
 
 
+class TelegramLogHandler(logging.Handler):
+    def __init__(self, bot: Bot, chat_id: int):
+        super().__init__()
+        self.bot = bot
+        self.chat_id = chat_id
+
+    def emit(self, record: logging.LogRecord):
+        try:
+            message = self.format(record)
+            loop = asyncio.get_running_loop()
+            loop.create_task(
+                self.bot.send_mmessage(chat_id=self.chat_id, text=message)
+            )
+        except Exception:
+            self.handleError(record)
+
+
 def fetch_review(devman_token, timestamp=None):
     headers = {"Authorization": f"Token {devman_token}"}
     params = {}
@@ -68,6 +85,12 @@ async def main() -> None:
     bot = Bot(token=os.environ["TELEGRAM_BOT_TOKEN"])
     chat_id = int(os.environ["TELEGRAM_CHAT_ID"])
     devman_token = os.environ["DEVMAN_TOKEN"]
+
+    telegram_handler = TelegramLogHandler(bot, chat_id)
+    telegram_handler.setFormatter(
+        logging.Formatter("%(levelname)s - %(message)s")
+    )
+    logger.addHandler(telegram_handler)
 
     logger.info("Бот запущен, начинаю мониторинг")
 
