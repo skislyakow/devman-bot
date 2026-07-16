@@ -98,12 +98,16 @@ async def main() -> None:
 
     logger.info("Бот запущен, начинаю мониторинг")
 
-    while True:
-        try:
-            1 / 0  # тестовая ошибка — потом удалить
-            await monitor_reviews(bot, devman_token, chat_id)
-        except Exception:
-            logger.error("Бот упал, перезапускаю...", exc_info=True)
+    async def run():
+        while True:
+            try:
+                1 / 0  # тестовая ошибка — потом удалить
+                await monitor_reviews(bot, devman_token, chat_id)
+            except Exception:
+                logger.error("Бот упал, перезапускаю...", exc_info=True)
+                await asyncio.sleep(1)
+
+    await run()
 
 
 if __name__ == "__main__":
