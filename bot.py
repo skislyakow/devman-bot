@@ -22,6 +22,8 @@ class TelegramLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord):
         try:
             message = self.format(record)
+            if len(message) > 4000:
+                message = message[:4000] + "\n... (обрезано)"
             loop = asyncio.get_running_loop()
             loop.create_task(
                 self.bot.send_message(chat_id=self.chat_id, text=message)
@@ -80,7 +82,7 @@ async def main() -> None:
         level=logging.INFO,
         stream=sys.stderr,
     )
-    logger = logging.getLogger()
+    logger = logging.getLogger("bot")
 
     bot = Bot(token=os.environ["TELEGRAM_BOT_TOKEN"])
     chat_id = int(os.environ["TELEGRAM_CHAT_ID"])
