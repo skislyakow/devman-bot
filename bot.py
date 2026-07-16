@@ -20,6 +20,8 @@ class TelegramLogHandler(logging.Handler):
         self.chat_id = chat_id
 
     def emit(self, record: logging.LogRecord):
+        if record.name.startswith(("httpx", "telegram", "urllib3")):
+            return
         try:
             message = self.format(record)
             if len(message) > 4000:
