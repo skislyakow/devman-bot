@@ -1,5 +1,7 @@
 import asyncio
+import logging
 import os
+import sys
 
 from dotenv import load_dotenv
 import requests
@@ -56,9 +58,18 @@ async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
 async def main() -> None:
     load_dotenv()
 
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+        stream=sys.stderr,
+    )
+    logger = logging.getLogger(__name__)
+
     bot = Bot(token=os.environ["TELEGRAM_BOT_TOKEN"])
     chat_id = int(os.environ["TELEGRAM_CHAT_ID"])
     devman_token = os.environ["DEVMAN_TOKEN"]
+
+    logger.info("Бот запущен, начинаю мониторинг")
 
     await monitor_reviews(bot, devman_token, chat_id)
 
