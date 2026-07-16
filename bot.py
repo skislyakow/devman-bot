@@ -101,7 +101,6 @@ async def main() -> None:
     async def run():
         while True:
             try:
-                1 / 0  # тестовая ошибка — потом удалить
                 await monitor_reviews(bot, devman_token, chat_id)
             except Exception:
                 logger.error("Бот упал, перезапускаю...", exc_info=True)
