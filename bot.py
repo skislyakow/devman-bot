@@ -24,7 +24,7 @@ class TelegramLogHandler(logging.Handler):
             message = self.format(record)
             loop = asyncio.get_running_loop()
             loop.create_task(
-                self.bot.send_mmessage(chat_id=self.chat_id, text=message)
+                self.bot.send_message(chat_id=self.chat_id, text=message)
             )
         except Exception:
             self.handleError(record)
@@ -80,7 +80,7 @@ async def main() -> None:
         level=logging.INFO,
         stream=sys.stderr,
     )
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger()
 
     bot = Bot(token=os.environ["TELEGRAM_BOT_TOKEN"])
     chat_id = int(os.environ["TELEGRAM_CHAT_ID"])
