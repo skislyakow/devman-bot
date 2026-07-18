@@ -22,16 +22,14 @@ class TelegramLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord):
         if record.name.startswith(("httpx", "telegram", "urllib3")):
             return
-        try:
-            message = self.format(record)
-            if len(message) > 4000:
-                message = message[:4000] + "\n... (обрезано)"
-            loop = asyncio.get_running_loop()
-            loop.create_task(
-                self.bot.send_message(chat_id=self.chat_id, text=message)
-            )
-        except Exception:
-            self.handleError(record)
+
+        message = self.format(record)
+        if len(message) > 4000:
+            message = message[:4000] + "\n... (обрезано)"
+        loop = asyncio.get_running_loop()
+        loop.create_task(
+            self.bot.send_message(chat_id=self.chat_id, text=message)
+        )
 
 
 def fetch_review(devman_token, timestamp=None):
@@ -39,20 +37,15 @@ def fetch_review(devman_token, timestamp=None):
     params = {}
     if timestamp:
         params["timestamp"] = timestamp
-    try:
-        response = requests.get(
-            f"{BASE_URL}long_polling/",
-            headers=headers,
-            params=params,
-            timeout=5,
-        )
-        response.raise_for_status()
-        return response.json()
-    except (
-        requests.exceptions.ReadTimeout,
-        requests.exceptions.ConnectionError,
-    ):
-        return {"status": "error", "timestamp_to_request": timestamp}
+
+    response = requests.get(
+        f"{BASE_URL}long_polling/",
+        headers=headers,
+        params=params,
+        timeout=(5, 60),
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
@@ -72,7 +65,7 @@ async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
                 )
                 await bot.send_message(chat_id=chat_id, text=text)
             timestamp = result["last_attempt_timestamp"]
-        elif result["status"] in ("timeout", "error"):
+        elif result["status"] == "timeout":
             timestamp = result["timestamp_to_request"]
 
 
