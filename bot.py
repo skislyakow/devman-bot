@@ -50,14 +50,21 @@ def fetch_review(devman_token, timestamp=None):
 
 async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
     timestamp = None
+    delay = 1
+
     while True:
         try:
-            result = await asyncio.to_thread(fetch_review, devman_token, timestamp)
+            result = await asyncio.to_thread(
+                fetch_review, devman_token, timestamp
+            )
         except (
             requests.exceptions.ReadTimeout,
             requests.exceptions.ConnectionError,
         ):
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 60)
             continue
+        delay = 1
         if result["status"] == "found":
             for attempt in result["new_attempts"]:
                 emoji = "✅" if not attempt["is_negative"] else "❌"
