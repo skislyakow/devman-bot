@@ -57,10 +57,9 @@ async def monitor_reviews(bot: Bot, devman_token: str, chat_id: int) -> None:
             result = await asyncio.to_thread(
                 fetch_review, devman_token, timestamp
             )
-        except (
-            requests.exceptions.ReadTimeout,
-            requests.exceptions.ConnectionError,
-        ):
+        except requests.exceptions.ReadTimeout:
+            continue
+        except requests.exceptions.ConnectionError:
             await asyncio.sleep(delay)
             delay = min(delay * 2, 60)
             continue
